@@ -1,48 +1,50 @@
 "use client"
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
 
-const Page = () => {
-  const [employees, setEmployees] = useState([]);
+type Employee = {
+  id: number;
+  employee_name: string;
+ 
+};
+
+function Page() {
+  const [employees, setEmployees] = useState<Employee[]>([]); // Specify the type
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-   const apiUrl = 'https://dummy.restapiexample.com/api/v1/employees';
-    axios.get(apiUrl)
-      .then((response) => {
+    const fetchData = async () => {
+      try {
+        const apiUrl = 'https://dummy.restapiexample.com/api/v1/employees';
+        const response = await axios.get(apiUrl);
         setEmployees(response.data.data);
         setLoading(false);
-      })
-      .catch((error) => {
-       console.error('Error fetching data:', error);
+      } catch (error) {
+        console.error('Error fetching data:', error);
         setLoading(false);
-      });
+      }
+    };
+
+    fetchData();
   }, []);
 
   return (
     <div>
-      <h1>Employee List</h1>
       {loading ? (
         <p>Loading...</p>
       ) : (
         <ul>
           {employees.map((employee) => (
-            <li key={employee.id}>
-              {employee.employee_name} -
-               {employee.employee_age}
-                years old
-              <br></br>
-              <Link href={`/dashboard/${employee.id}`}>
-              View Details
-            </Link>
-            </li>
-            
+            <li key={employee.id}>{employee.employee_name}  <Link href={`/dashboard/${employee.id}`}>
+            View Details
+          </Link></li>
+
           ))}
         </ul>
       )}
     </div>
   );
-};
+}
 
 export default Page;
